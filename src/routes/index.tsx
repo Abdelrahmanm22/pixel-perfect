@@ -1,24 +1,51 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
+import { Navbar } from "@/components/Navbar";
+import { Hero } from "@/components/Hero";
+import { About } from "@/components/About";
+import { Services } from "@/components/Services";
+import { SkillsMarquee } from "@/components/SkillsMarquee";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { VideoCards } from "@/components/VideoCards";
+import { BTS } from "@/components/BTS";
+import { Clients } from "@/components/Clients";
+import { Contact } from "@/components/Contact";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const title = "Abdalla Saber — Art Director, Filmmaker & Photographer";
+const description =
+  "Portfolio of Abdalla Saber, an Art Director, Filmmaker, Photographer and Studio Manager with 14+ years in commercial photography, cinematic videography and advertising production.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: "Abdalla Saber — Art Director" },
+      {
+        property: "og:description",
+        content: "Filmmaker • Photographer • Studio Manager — 14+ years of visual storytelling",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="overflow-x-hidden">
+      <Navbar />
+      <Hero />
+      <About />
+      <Services />
+      <SkillsMarquee />
+      <PhotoCarousel />
+      <VideoCards />
+      <BTS />
+      <Clients />
+      <Contact />
+      <Toaster />
+    </main>
   );
 }
