@@ -1,3 +1,8 @@
+// Copy, services and skills below are final. The `photography`, `films` and `bts`
+// arrays still hold Unsplash placeholders — swap them for the real work by dropping
+// files into src/assets/ and importing them here, or by pasting hosted URLs. Nothing
+// outside this file needs to change. Client logos live in ./clients.ts.
+
 export const services = [
   {
     id: "01",
@@ -126,6 +131,9 @@ export type Film = {
   title: string;
   category: string;
   meta: string;
+  /** Embeddable player URL (YouTube/Vimeo embed, or a Drive /preview link). When
+   *  set, the lightbox plays it instead of re-showing the thumbnail. */
+  url?: string;
 };
 
 export const films: Film[] = [
@@ -188,47 +196,9 @@ export const bts = [
   },
 ];
 
-export const clients = [
-  "Automotive Hub",
-  "Carogo",
-  "Crowne Plaza",
-  "Dream Hills",
-  "Dream Land",
-  "El Deeb Cars",
-  "Emerald",
-  "EPIC",
-  "Galaxy Interior",
-  "GTM",
-  "Hilton",
-  "Joelle Cosmetics",
-  "JORA Developments",
-  "Jumeirah",
-  "JUNO",
-  "MaxProfit",
-  "Mountain View",
-  "Mövenpick",
-  "MSA University",
-  "NASDAQ Urban Development",
-  "PDCA",
-  "QLS",
-  "Sky Light",
-  "Spade",
-  "Valéa",
-  "Viena",
-  "Wesal",
-  "X-Eagle",
-  "ZG",
-  "Zuwad",
-  "الرفاعي",
-  "الفارس",
-  "طبيعة",
-  "مجوهرات ناصر",
-];
-
 export const contact = {
   email: "abdallasaber500@gmail.com",
   phone: "+20 1097901285",
   location: "October, Giza, Egypt",
-  portfolio:
-    "https://drive.google.com/drive/folders/1ZqwfQ2N-8UFOohoF3moXNgvm1GzodPU2",
+  portfolio: "https://drive.google.com/drive/folders/1ZqwfQ2N-8UFOohoF3moXNgvm1GzodPU2",
 };

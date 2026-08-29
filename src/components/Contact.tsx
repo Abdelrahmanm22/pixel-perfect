@@ -1,21 +1,23 @@
-import { useState } from "react";
 import { motion } from "motion/react";
-import { Instagram, Linkedin, Youtube, Dribbble } from "lucide-react";
 import { toast } from "sonner";
 import { contact } from "@/data/portfolio";
-import signature from "@/assets/signature.jpg.asset.json";
-import nameLogo from "@/assets/name-arabic-white.png.asset.json";
+import wordmark from "@/assets/generated/wordmark-white.webp";
 
-const socials = [
-  { label: "Instagram", icon: Instagram },
-  { label: "Behance", icon: Dribbble },
-  { label: "LinkedIn", icon: Linkedin },
-  { label: "YouTube", icon: Youtube },
-];
+// No backend here — the form hands the message to the visitor's mail client
+// addressed to Abdalla, so nothing on the page pretends to have sent something.
+function composeEmail(form: HTMLFormElement) {
+  const data = new FormData(form);
+  const name = String(data.get("name") ?? "");
+  const email = String(data.get("email") ?? "");
+  const message = String(data.get("message") ?? "");
+
+  const subject = `Project enquiry — ${name}`;
+  const body = `${message}\n\n—\n${name}\n${email}`;
+
+  return `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
 
 export function Contact() {
-  const [sending, setSending] = useState(false);
-
   return (
     <section id="contact" className="relative grid-bg-dark pt-20 md:pt-32">
       <div className="pointer-events-none absolute inset-0 noise-overlay" />
@@ -62,35 +64,23 @@ export function Contact() {
               </div>
             </dl>
 
-            <div className="mt-8 flex gap-3">
-              {socials.map((s) => (
-                <a
-                  key={s.label}
-                  href="#"
-                  aria-label={s.label}
-                  className="flex size-11 items-center justify-center border border-border text-foreground transition-colors hover:border-primary hover:text-primary"
-                >
-                  <s.icon size={18} />
-                </a>
-              ))}
-            </div>
-
-            <img
-              src={signature.url}
-              alt="Abdalla Saber signature"
-              className="mt-10 h-16 w-auto -rotate-2 opacity-90 mix-blend-screen invert"
-            />
+            <a
+              href={contact.portfolio}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="meta mt-8 inline-flex items-center gap-2 border border-primary px-4 py-3 text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+            >
+              Full portfolio on Drive
+            </a>
           </div>
 
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              setSending(true);
-              setTimeout(() => {
-                setSending(false);
-                (e.target as HTMLFormElement).reset();
-                toast.success("Message noted — I'll be in touch shortly.");
-              }, 600);
+              const form = e.currentTarget;
+              window.location.href = composeEmail(form);
+              form.reset();
+              toast.success("Opening your mail app with the message ready to send.");
             }}
             className="space-y-4 border border-border bg-card p-6"
           >
@@ -122,17 +112,17 @@ export function Contact() {
             </label>
             <button
               type="submit"
-              disabled={sending}
-              className="meta w-full bg-primary px-5 py-3 text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="meta w-full bg-primary px-5 py-3 text-primary-foreground transition-opacity hover:opacity-90"
             >
-              {sending ? "Sending…" : "Send message"}
+              Send message
             </button>
+            <p className="meta text-foreground/40">Opens in your mail app</p>
           </form>
         </div>
 
         <footer className="mt-20 flex flex-wrap items-center justify-between gap-6 border-t border-border py-8">
-          <img src={nameLogo.url} alt="Abdalla Saber" className="h-6 w-auto opacity-80" />
-          <span className="meta">© 2024 Abdalla Saber — Art Director</span>
+          <img src={wordmark} alt="Abdalla Saber" className="h-6 w-auto opacity-80" />
+          <span className="meta">© {new Date().getFullYear()} Abdalla Saber — Art Director</span>
         </footer>
       </div>
     </section>

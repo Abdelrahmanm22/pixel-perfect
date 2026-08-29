@@ -1,5 +1,6 @@
-import { useRef, useState } from "react";
-import { motion, useMotionValue, useTransform } from "motion/react";
+import { useCallback, useRef, useState } from "react";
+import { animate, motion, useMotionValue, useTransform } from "motion/react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { photography } from "@/data/portfolio";
 
 function Card({
@@ -33,9 +34,7 @@ function Card({
         className="aspect-[3/4] w-full object-cover"
       />
       <figcaption className="flex items-center justify-between gap-2 bg-[color:var(--cream)] px-3 py-2">
-        <span className="font-display text-lg uppercase text-[color:var(--ink)]">
-          {shot.title}
-        </span>
+        <span className="font-display text-lg uppercase text-[color:var(--ink)]">{shot.title}</span>
         <span className="meta text-[color:var(--ink)]/60">
           {shot.client} / {shot.year}
         </span>
@@ -44,12 +43,23 @@ function Card({
   );
 }
 
+const clamp = (v: number) => Math.max(0, Math.min(photography.length - 1, v));
+
 export function PhotoCarousel() {
   const progress = useMotionValue(Math.floor(photography.length / 2));
   const [active, setActive] = useState(Math.floor(photography.length / 2));
   const dragStart = useRef(0);
 
-  const clamp = (v: number) => Math.max(0, Math.min(photography.length - 1, v));
+  // Springs the deck to a card instead of snapping the motion value outright,
+  // which is what made drag-release jump.
+  const goTo = useCallback(
+    (index: number) => {
+      const target = clamp(index);
+      setActive(target);
+      animate(progress, target, { type: "spring", stiffness: 260, damping: 30 });
+    },
+    [progress],
+  );
 
   return (
     <section id="work" className="relative grid-bg-dark py-20 md:py-32">
@@ -59,7 +69,7 @@ export function PhotoCarousel() {
           <h2 className="display-lg uppercase text-foreground">Selected Work</h2>
           <span className="hand rotate-3 text-2xl md:text-3xl">photography</span>
         </div>
-        <p className="meta mt-4">Drag to fan the deck — {photography.length} frames</p>
+        <p className="meta mt-4">Drag or use the arrow keys — {photography.length} frames</p>
       </div>
 
       <div
@@ -67,7 +77,20 @@ export function PhotoCarousel() {
         style={{ perspective: "1400px" }}
       >
         <motion.div
-          className="absolute inset-0 cursor-grab active:cursor-grabbing"
+          role="group"
+          aria-roledescription="carousel"
+          aria-label="Selected photography"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") {
+              e.preventDefault();
+              goTo(active - 1);
+            } else if (e.key === "ArrowRight") {
+              e.preventDefault();
+              goTo(active + 1);
+            }
+          }}
+          className="absolute inset-0 cursor-grab outline-none active:cursor-grabbing focus-visible:ring-1 focus-visible:ring-primary"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.2}
@@ -77,11 +100,7 @@ export function PhotoCarousel() {
           onDrag={(_, info) => {
             progress.set(clamp(dragStart.current - info.offset.x / 240));
           }}
-          onDragEnd={() => {
-            const snapped = clamp(Math.round(progress.get()));
-            progress.set(snapped);
-            setActive(snapped);
-          }}
+          onDragEnd={() => goTo(Math.round(progress.get()))}
           style={{ transformStyle: "preserve-3d" }}
         >
           {photography.map((shot, i) => (
@@ -90,20 +109,38 @@ export function PhotoCarousel() {
         </motion.div>
       </div>
 
-      <div className="mt-8 flex justify-center gap-2">
-        {photography.map((s, i) => (
-          <button
-            key={s.src}
-            aria-label={`Go to ${s.title}`}
-            onClick={() => {
-              progress.set(i);
-              setActive(i);
-            }}
-            className={`h-[3px] w-8 transition-colors ${
-              i === active ? "bg-primary" : "bg-border"
-            }`}
-          />
-        ))}
+      <div className="mt-8 flex items-center justify-center gap-6">
+        <button
+          aria-label="Previous frame"
+          onClick={() => goTo(active - 1)}
+          disabled={active === 0}
+          className="flex size-10 items-center justify-center border border-border text-foreground transition-colors hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-foreground"
+        >
+          <ArrowLeft size={16} />
+        </button>
+
+        <div className="flex gap-2">
+          {photography.map((s, i) => (
+            <button
+              key={s.src}
+              aria-label={`Go to ${s.title}`}
+              aria-current={i === active}
+              onClick={() => goTo(i)}
+              className={`h-[3px] w-8 transition-colors ${
+                i === active ? "bg-primary" : "bg-border"
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          aria-label="Next frame"
+          onClick={() => goTo(active + 1)}
+          disabled={active === photography.length - 1}
+          className="flex size-10 items-center justify-center border border-border text-foreground transition-colors hover:border-primary hover:text-primary disabled:opacity-30 disabled:hover:border-border disabled:hover:text-foreground"
+        >
+          <ArrowRight size={16} />
+        </button>
       </div>
     </section>
   );

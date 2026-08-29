@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
-import nameLogo from "@/assets/name-arabic-white.png.asset.json";
+import wordmark from "@/assets/generated/wordmark-white.webp";
 
 const links = [
   { label: "About", href: "#about" },
@@ -34,7 +34,7 @@ export function Navbar() {
             AS
           </span>
           <img
-            src={nameLogo.url}
+            src={wordmark}
             alt="Abdalla Saber"
             className="hidden h-4 w-auto opacity-80 sm:block"
           />

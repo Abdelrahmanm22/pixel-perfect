@@ -1,8 +1,9 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { ArrowDown } from "lucide-react";
-import mainPhoto from "@/assets/abdalla-main.jpg.asset.json";
-import signature from "@/assets/signature.jpg.asset.json";
+import { useIsMobile } from "@/hooks/use-mobile";
+import portrait from "@/assets/generated/abdalla-main.webp";
+import wordmark from "@/assets/generated/wordmark-white.webp";
 
 const HeroScene = lazy(() => import("./HeroScene"));
 
@@ -10,13 +11,19 @@ export function Hero() {
   const { scrollY } = useScroll();
   const photoY = useTransform(scrollY, [0, 600], [0, 90]);
   const [mounted, setMounted] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const isMobile = useIsMobile();
   useEffect(() => setMounted(true), []);
+
+  // The 3D canvas is decorative: skip it on phones and for reduced-motion users
+  // rather than paying for three.js on either.
+  const showScene = mounted && !isMobile && !reduceMotion;
 
   return (
     <section id="top" className="relative min-h-svh overflow-hidden grid-bg-dark">
       <div className="pointer-events-none absolute inset-0 noise-overlay" />
 
-      {mounted && (
+      {showScene && (
         <div className="pointer-events-none absolute right-[-6%] top-[8%] h-[70vh] w-[70vw] opacity-40 md:w-[45vw]">
           <Suspense fallback={null}>
             <HeroScene />
@@ -60,9 +67,9 @@ export function Hero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 0.9, scale: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
-            src={signature.url}
+            src={wordmark}
             alt="Abdalla Saber signature"
-            className="mt-6 h-16 w-auto -rotate-2 mix-blend-screen invert md:h-24"
+            className="mt-6 h-16 w-auto -rotate-2 md:h-24"
           />
 
           <motion.div
@@ -86,7 +93,7 @@ export function Hero() {
             className="mt-10 flex flex-wrap items-center gap-6"
           >
             <span className="meta border border-border px-3 py-1">14+ yrs experience</span>
-            <span className="meta">© 2024 — All rights reserved</span>
+            <span className="meta">© {new Date().getFullYear()} — All rights reserved</span>
           </motion.div>
         </div>
 
@@ -98,11 +105,23 @@ export function Hero() {
             transition={{ duration: 1, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="relative"
           >
-            <img
-              src={mainPhoto.url}
-              alt="Portrait of Abdalla Saber"
-              className="cutout-photo mx-auto w-full max-w-md rotate-2"
-            />
+            {/* The portrait is a rectangular studio frame, not a transparent cutout,
+                so it gets the brief's "thick coloured outline" as a hard red block
+                offset behind the photo rather than a silhouette drop-shadow. */}
+            <div className="relative mx-auto w-full max-w-md rotate-2">
+              <span
+                aria-hidden
+                className="absolute inset-0 translate-x-3 translate-y-3 bg-[color:var(--red)] md:translate-x-4 md:translate-y-4"
+              />
+              <img
+                src={portrait}
+                alt="Portrait of Abdalla Saber"
+                width={1400}
+                height={1732}
+                fetchPriority="high"
+                className="relative h-auto w-full border border-[color:var(--red)]"
+              />
+            </div>
             <span className="hand absolute left-2 top-6 -rotate-6 text-2xl md:text-3xl">
               Cairo, EG
             </span>
@@ -121,7 +140,7 @@ export function Hero() {
       >
         <span className="meta">Scroll</span>
         <motion.span
-          animate={{ y: [0, 8, 0] }}
+          animate={{ y: reduceMotion ? 0 : [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.6 }}
           className="text-primary"
         >

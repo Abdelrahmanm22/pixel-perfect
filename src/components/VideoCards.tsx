@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Play, X, ArrowRight } from "lucide-react";
 import { films, contact, type Film } from "@/data/portfolio";
 
@@ -29,9 +29,7 @@ function Card({ film, onOpen }: { film: Film; onOpen: (f: Film) => void }) {
           </h3>
           <span className="meta">{film.meta}</span>
         </div>
-        <span className="meta border border-primary px-2 py-1 text-primary">
-          {film.category}
-        </span>
+        <span className="meta border border-primary px-2 py-1 text-primary">{film.category}</span>
       </div>
     </button>
   );
@@ -39,10 +37,11 @@ function Card({ film, onOpen }: { film: Film; onOpen: (f: Film) => void }) {
 
 export function VideoCards() {
   const [open, setOpen] = useState<Film | null>(null);
+  const reduceMotion = useReducedMotion();
   const loop = [...films, ...films];
 
   return (
-    <section className="relative grid-bg-dark py-20 md:py-32">
+    <section id="showreel" className="relative grid-bg-dark py-20 md:py-32">
       <div className="pointer-events-none absolute inset-0 noise-overlay" />
       <div className="relative mx-auto max-w-[1600px] px-5 md:px-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
@@ -55,15 +54,17 @@ export function VideoCards() {
             rel="noreferrer noopener"
             className="meta inline-flex -rotate-1 items-center gap-2 bg-primary px-5 py-3 text-primary-foreground transition-transform hover:rotate-0"
           >
-            View full portfolio <ArrowRight size={14} />
+            View full videos <ArrowRight size={14} />
           </a>
         </div>
       </div>
 
-      <div className="relative mt-12 overflow-hidden">
+      {/* The padding lives on the wrapper and the trailing pr-6 matches the gap, so
+          the -50% loop point lands exactly one set along with no seam. */}
+      <div className="relative mt-12 overflow-hidden pl-5 md:pl-10">
         <motion.div
-          className="flex gap-6 pl-5 md:pl-10"
-          animate={{ x: ["0%", "-50%"] }}
+          className="flex gap-6 pr-6"
+          animate={{ x: reduceMotion ? "0%" : ["0%", "-50%"] }}
           transition={{ repeat: Infinity, ease: "linear", duration: 40 }}
         >
           {loop.map((f, i) => (
@@ -95,7 +96,21 @@ export function VideoCards() {
               >
                 <X size={22} />
               </button>
-              <img src={open.thumb} alt={open.title} className="aspect-video w-full object-cover" />
+              {open.url ? (
+                <iframe
+                  src={open.url}
+                  title={open.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                  className="aspect-video w-full"
+                />
+              ) : (
+                <img
+                  src={open.thumb}
+                  alt={open.title}
+                  className="aspect-video w-full object-cover"
+                />
+              )}
               <div className="flex flex-wrap items-center justify-between gap-3 p-5">
                 <div>
                   <h3 className="font-display text-3xl uppercase text-card-foreground">
