@@ -156,8 +156,10 @@ export function VideoCards() {
           className="flex gap-6 pr-6"
           animate={{ x: reduceMotion ? "0%" : ["0%", "-50%"] }}
           // Scaled with the slate: the track is one card-width per film, so the
-          // duration has to grow with the count or the marquee speeds up.
-          transition={{ repeat: Infinity, ease: "linear", duration: films.length * 6 }}
+          // duration has to grow with the count or the marquee speeds up as work
+          // is added. 3s per film puts the pace at ~100 px/s — brisk, but a card
+          // still takes ~3s to pass its own width so the titles stay readable.
+          transition={{ repeat: Infinity, ease: "linear", duration: films.length * 3 }}
         >
           {loop.map((f, i) => (
             <Card key={`${f.slug}-${i}`} film={f} onOpen={setOpen} />

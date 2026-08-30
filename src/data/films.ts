@@ -48,12 +48,10 @@ const REELS: ReadonlyArray<Omit<Film, "poster" | "src">> = [
     vertical: true,
   },
   {
-    // Filed as "JONO PLAZA.mp4", but the client's logo in the Trusted By wall
-    // reads JUNO PLAZA — one spelling per brand across the page.
-    slug: "juno-plaza",
-    title: "JUNO Plaza",
+    slug: "dcm-real-estate",
+    title: "DCM Real Estate",
     category: "Real Estate",
-    duration: "1:03",
+    duration: "0:41",
     vertical: true,
   },
   {
@@ -77,11 +75,13 @@ const REELS: ReadonlyArray<Omit<Film, "poster" | "src">> = [
     duration: "0:29",
     vertical: true,
   },
-  {
-    slug: "dcm-real-estate",
-    title: "DCM Real Estate",
+{
+    // Filed as "JONO PLAZA.mp4", but the client's logo in the Trusted By wall
+    // reads JUNO PLAZA — one spelling per brand across the page.
+    slug: "juno-plaza",
+    title: "JUNO Plaza",
     category: "Real Estate",
-    duration: "0:41",
+    duration: "1:03",
     vertical: true,
   },
   {
