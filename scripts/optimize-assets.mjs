@@ -199,9 +199,63 @@ async function buildPortrait() {
   await report("og-image.jpg", ogDest);
 }
 
+// Selected Work carousel. Filenames are mapped explicitly rather than slugified:
+// one contains a double space, extensions vary across .JPG/.jpg/.jpeg, and the
+// titles want editing anyway. Order here is the order they fan out in the deck.
+const WORK = [
+  { file: "hardship 2026.jpg", slug: "hardship" },
+  { file: "urban scenes 2026.jpg", slug: "urban-scenes" },
+  // Double space between "Street" and "Documentary" is in the filename on disk.
+  { file: "Street  Documentary Photography 2026.jpg", slug: "street-documentary" },
+  { file: "Rolls-Royce.jpeg", slug: "rolls-royce" },
+  { file: "Luxury Automotive Photography 2026.jpeg", slug: "luxury-automotive" },
+  { file: "Fashion 2025.JPG", slug: "fashion-2025" },
+  { file: "Fashion 2018.jpg", slug: "fashion-2018" },
+  { file: "Commercial Photography 2024.JPG", slug: "commercial-photography" },
+  { file: "TOBACCO 2024.JPG", slug: "tobacco" },
+  { file: "Fashion 2017.jpg", slug: "fashion-2017" },
+  { file: "Fashion 2015.jpg", slug: "fashion-2015" },
+];
+
+async function buildWork() {
+  const dir = join(assets, "Selected Work Images");
+  const workOut = join(outDir, "work");
+  await mkdir(workOut, { recursive: true });
+
+  console.log("\nSelected Work");
+  const present = new Set(await readdir(dir).catch(() => []));
+  const manifest = [];
+  let total = 0;
+
+  for (const { file, slug } of WORK) {
+    if (!present.has(file)) {
+      console.log(`  ${slug.padEnd(34)} MISSING — no "${file}"`);
+      continue;
+    }
+    const dest = join(workOut, `${slug}.webp`);
+    // .rotate() with no argument bakes in any EXIF orientation, so the stored
+    // dimensions below always match what the browser will actually draw.
+    const info = await sharp(join(dir, file))
+      .rotate()
+      .resize({ width: 1600, height: 1600, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82 })
+      .toFile(dest);
+
+    manifest.push({ slug, width: info.width, height: info.height });
+    total += await report(`${slug}.webp  ${info.width}x${info.height}`, dest);
+  }
+
+  // The carousel sizes cards from the true aspect ratio, so it reads the emitted
+  // dimensions rather than hardcoding numbers that would drift if the resize
+  // settings ever change.
+  await writeFile(join(workOut, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
+  console.log(`  ${"".padEnd(34)} ${kb(total).padStart(8)} total`);
+}
+
 await mkdir(logoOut, { recursive: true });
 await buildLogos();
 await buildBrandMarks();
+await buildWork();
 await buildPortrait();
 
 // Written so the generated directory is self-documenting in a diff.

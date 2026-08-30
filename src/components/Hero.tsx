@@ -117,7 +117,7 @@ export function Hero() {
                 src={portrait}
                 alt="Portrait of Abdalla Saber"
                 width={1400}
-                height={1732}
+                height={1852}
                 fetchPriority="high"
                 className="relative h-auto w-full border border-[color:var(--red)]"
               />

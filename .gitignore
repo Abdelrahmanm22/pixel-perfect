@@ -20,6 +20,18 @@ dist-ssr
 .wrangler/
 .dev.vars
 
+# Video masters — ~772 MB of 17-80 Mbps showreel exports and ~120 MB of
+# camera-original BTS QuickTime. Source of truth for `npm run optimize:videos`,
+# which writes the web encodes to public/videos/ and public/bts/ — those ARE
+# committed. Never commit the masters themselves.
+src/assets/Videos/
+src/assets/Behind the Scenes/
+
+# Photography masters (~115 MB of full-resolution stills). Source of truth for
+# `npm run optimize:assets`, which writes web-sized WebP into
+# src/assets/generated/work/ — that IS committed.
+src/assets/Selected Work Images/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
